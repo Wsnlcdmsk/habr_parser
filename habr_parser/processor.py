@@ -1,0 +1,1 @@
+"""This module contains function for processing articles."""

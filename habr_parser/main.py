@@ -1,0 +1,1 @@
+"""This module is the main entry point for the Habr parser application."""
