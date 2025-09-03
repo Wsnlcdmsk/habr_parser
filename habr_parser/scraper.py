@@ -23,7 +23,7 @@ def get_daily_articles(page_content):
 
     results = []
     for art in articles:
-        title_tag = art.select_one("h2 a")
+        title_tag = art.select_one("a[data-article-link='true']")
         votes_tag = art.select_one(".tm-votes-meter__value")
         author_tag = art.select_one(".tm-user-info__username")
         time_tag = art.select_one("time")
@@ -39,7 +39,7 @@ def get_daily_articles(page_content):
             "published": time_tag.get("datetime") if time_tag else None,
             "views": int(views_tag.get("title")) if views_tag and views_tag.get("title") else None,
             "comments": int(comments_tag.get_text(strip=True)) if comments_tag else 0,
-            "hubs": [hub.get_text(strip=True) for hub in hubs_tags] if hubs_tags else []
+            "hubs": [hub.get_text(strip=True) for hub in hubs_tags if hub.get_text(strip = True) != '*'] if hubs_tags else []
         })
 
     with open("data/articles.json", "w", encoding="utf-8") as f:
