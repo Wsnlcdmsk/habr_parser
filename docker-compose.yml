@@ -4,12 +4,10 @@ services:
   db:
     image: postgres:latest
     container_name: my-postgres
-    environment:
-      POSTGRES_USER: timofey
-      POSTGRES_PASSWORD: supersecret
-      POSTGRES_DB: habrparsedb
+    env_file:
+      - .env
     ports:
-      - "5555:5555"
+      - "5555:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
 
