@@ -4,7 +4,6 @@ from sqlalchemy import select, update, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from habr_parser.db.models import Article
-from habr_parser.db.database import get_session
 
 
 async def save_article(session: AsyncSession, article_data: dict) -> Article:

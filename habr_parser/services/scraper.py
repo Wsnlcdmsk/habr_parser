@@ -1,8 +1,9 @@
 """This module contains functions for scraping articles from Habr."""
 
+import json
+
 import requests
 from bs4 import BeautifulSoup
-import json
 
 
 def fetch_habr_page(url):
@@ -17,7 +18,7 @@ def fetch_habr_page(url):
 
 def get_daily_articles(page_content):
     """Gets list of articles from the page HTML"""
-    
+
     soup = BeautifulSoup(page_content, "lxml")
     articles = soup.select("article.tm-articles-list__item")
 
