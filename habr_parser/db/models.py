@@ -11,12 +11,12 @@ from sqlalchemy import String
 from sqlalchemy import ForeignKey
 from sqlalchemy import DateTime
 from sqlalchemy import CheckConstraint
+from sqlalchemy.ext.asyncio import AsyncAttrs
 
 
-class Base(DeclarativeBase):
-    """Base class for all ORM models."""
-    pass
-
+class Base(AsyncAttrs, DeclarativeBase):
+    """Base class for making tables"""
+    __abstract__ = True
 
 class Article(Base):
     """Represents an article scraped from Habr."""

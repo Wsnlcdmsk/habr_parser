@@ -1,6 +1,6 @@
 """This module is the main entry point for the Habr parser application."""
 
-from habr_parser.scraper import get_daily_articles, fetch_habr_page
+from habr_parser.habr_parser.scraper import get_daily_articles, fetch_habr_page
 from habr_parser.config import BASE_URL
 
 
