@@ -45,10 +45,11 @@ class Article(Base):
 
 class Hub(Base):
     """Represents a hub (category/tag) associated with an Article."""
+
     __tablename__ = "hubs"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    hub_name: Mapped[str] = mapped_column(String, nullable=False)
+    name: Mapped[str] = mapped_column(String, nullable=False)
     article_id: Mapped[int] = mapped_column(ForeignKey("articles.id"))
 
     article: Mapped[Article] = relationship(back_populates="hubs")

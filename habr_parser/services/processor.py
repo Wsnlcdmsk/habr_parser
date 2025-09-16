@@ -35,11 +35,6 @@ def safe_int(value: Any, default: int = 0) -> int:
         return default
 
 
-def filter_by_votes(articles: list[dict], min_votes: int = 10) -> list[dict]:
-    """Keeps only articles with votes ≥ min_votes."""
-    return [a for a in articles if safe_int(a.get("votes", 0)) >= min_votes]
-
-
 def filter_unique(articles: list[dict]) -> list[dict]:
     """Removes duplicate articles based on their URL."""
     seen = set()
@@ -70,3 +65,34 @@ def validate_article(article: dict) -> bool:
     if safe_int(article.get("votes", 0)) < 0:
         return False
     return True
+
+
+def process_articles(raw_articles: list[dict]) -> list[dict]:
+    """
+    Full processing pipeline:
+    1. Cleaning and normalization
+    2. Validation
+    3. Deduplication
+    4. Enrichment (adds is_top flag)
+    """
+
+    processed = []
+    for a in raw_articles:
+        article = {
+            "title": clean_title(a.get("title", "")),
+            "url": normalize_url(a.get("url", "")),
+            "votes": safe_int(a.get("votes", 0)),
+            "author": a.get("author"),
+            "published": parse_published(a.get("published")),
+            "views": safe_int(a.get("views", 0)),
+            "comments": safe_int(a.get("comments", 0)),
+            "hubs": a.get("hubs", []),
+        }
+
+        if validate_article(article):
+            processed.append(article)
+
+    processed = filter_unique(processed)
+    processed = mark_top_articles(processed)
+
+    return processed

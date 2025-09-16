@@ -3,4 +3,5 @@
 pycache
 *.pyc
 data/articles.json
+.github
 TODO
