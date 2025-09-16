@@ -12,6 +12,7 @@ def clean_title(title: str) -> str:
 
 def normalize_url(url: str) -> str:
     """Converts relative links into absolute ones (habr.com)."""
+    url = str(url)
     if url.startswith("/"):
         return f"https://habr.com{url}"
     return url

@@ -59,16 +59,16 @@ async def filter_articles_by_recommendation(
     return await recommender.recommend_articles(session, article_id)
 
 
-@router.delete("/{article_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_article(article_id: int,
-session: AsyncSession = Depends(get_session)) -> ArticleRead:
-    """Delete an article by its ID."""
-
+@router.delete("/{article_id}", response_model=ArticleRead)
+async def delete_article(article_id: int, session: AsyncSession = Depends(get_session)):
+    """Delete an article by its ID and return deleted article."""
     article_in_db = await crud.read_article(session, article_id)
     if not article_in_db:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
 
-    return await crud.delete_article(session, article_id)
+    await crud.delete_article(session, article_id)
+    return article_in_db
+
 
 
 @router.post("/", response_model=ArticleRead)

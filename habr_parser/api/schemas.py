@@ -18,8 +18,9 @@ class HubRead(HubBase):
     """Schema for reading a Hub (response model)."""
     id: int
 
-    class Config:
-        orm_mode = True
+    model_config = {
+        "from_attributes": True
+    }
 
 
 class ArticleBase(BaseModel):
@@ -43,5 +44,6 @@ class ArticleRead(ArticleBase):
     id: int
     hubs: list[HubRead] = Field(default_factory=list)
 
-    class Config:
-        orm_mode = True
+    model_config = {
+        "from_attributes": True
+    }

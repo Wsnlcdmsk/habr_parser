@@ -10,6 +10,7 @@ from sqlalchemy import Integer
 from sqlalchemy import String
 from sqlalchemy import ForeignKey
 from sqlalchemy import DateTime
+from sqlalchemy import Boolean
 from sqlalchemy import CheckConstraint
 from sqlalchemy.ext.asyncio import AsyncAttrs
 
@@ -18,12 +19,32 @@ class Base(AsyncAttrs, DeclarativeBase):
     """Base class for making tables"""
     __abstract__ = True
 
+
+class ArticleHub(Base):
+    """Represents adjacent table of articles and hubs."""
+
+    __tablename__ = "articles_hubs"
+    article_id: Mapped[int] = mapped_column(ForeignKey("articles.id"), primary_key=True)
+    hub_id: Mapped[int] = mapped_column(ForeignKey("hubs.id"), primary_key=True)
+
+    article: Mapped["Article"] = relationship(
+        back_populates="articles_hubs",
+        lazy="selectin"
+        )
+
+    hub: Mapped["Hub"] = relationship(
+        back_populates="articles_hubs",
+        lazy="selectin"
+        )
+
+
 class Article(Base):
     """Represents an article scraped from Habr."""
 
     __tablename__ = "articles"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    title: Mapped[str] = mapped_column(String, nullable=False)
     url: Mapped[str] = mapped_column(String, nullable=False)
     votes: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     author: Mapped[str] = mapped_column(String, nullable=False)
@@ -31,10 +52,13 @@ class Article(Base):
     views: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
     comments: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
 
-    hubs: Mapped[list["Hub"]] = relationship(
+    articles_hubs: Mapped[list["ArticleHub"]] = relationship(
         back_populates="article",
-        cascade= "all, delete orphan"
-        )
+        cascade="all, delete-orphan",
+        lazy="selectin"
+    )
+
+    is_top: Mapped[bool] = mapped_column(Boolean, nullable=False)
 
     __table_args__ = (
         CheckConstraint('votes >= 0', name='votes_non_negative'),
@@ -47,9 +71,11 @@ class Hub(Base):
     """Represents a hub (category/tag) associated with an Article."""
 
     __tablename__ = "hubs"
-
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    name: Mapped[str] = mapped_column(String, nullable=False)
-    article_id: Mapped[int] = mapped_column(ForeignKey("articles.id"))
+    name: Mapped[str] = mapped_column(String, nullable=False, unique=True)
 
-    article: Mapped[Article] = relationship(back_populates="hubs")
+    articles_hubs: Mapped[list["ArticleHub"]] = relationship(
+        back_populates="hub",
+        cascade="all, delete-orphan",
+        lazy="selectin"
+    )

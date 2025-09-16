@@ -1,10 +1,13 @@
 """This module contains functions for scraping and processing articles from Habr."""
 
+
 import json
 import requests
 from bs4 import BeautifulSoup
 
+from habr_parser.db.database import get_session_context
 from habr_parser.services import processor
+from habr_parser.db import crud
 
 
 def fetch_habr_page(url: str) -> str:
@@ -34,35 +37,37 @@ def parse_articles(page_content: str) -> list[dict]:
 
         results.append({
             "title": title_tag.get_text(strip=True) if title_tag else "",
-            "url": "https://habr.com" + title_tag["href"] if title_tag else "",
-            "votes": votes_tag.get_text(strip=True) if votes_tag else "0",
+            "url": "https://habr.com" + str(title_tag["href"]) if title_tag else "",
+            "votes": int(votes_tag.get_text(strip=True).replace("+", "")) if votes_tag else 0,
             "author": author_tag.get_text(strip=True) if author_tag else None,
             "published": time_tag.get("datetime") if time_tag else None,
-            "views": views_tag.get("title") if views_tag else "0",
-            "comments": comments_tag.get_text(strip=True) if comments_tag else "0",
+            "views": int(views_tag.get("title")) if views_tag and views_tag.get("title") else 0,
+            "comments": int(comments_tag.get_text(strip=True)) if comments_tag else 0,
             "hubs": [
                 hub.get_text(strip=True)
                 for hub in hubs_tags if hub.get_text(strip=True) != "*"
             ] if hubs_tags else []
         })
-
     return results
 
 
-def get_daily_articles(url: str) -> list[dict]:
-    """
-    Fetches, parses, processes, and saves daily articles from Habr.
-    Full pipeline:
-    1. Fetch HTML
-    2. Extract raw articles
-    3. Clean & normalize with processor
-    4. Save to JSON
-    """
-    page_content = fetch_habr_page(url)
-    raw_articles = parse_articles(page_content)
-    processed_articles = processor.process_articles(raw_articles)
+async def get_daily_articles(url:str, pages: int = 5) -> list[dict]:
+    """Fetches, parses, processes, and saves daily articles from multiple Habrs pages."""
 
-    with open("data/articles.json", "w", encoding="utf-8") as f:
-        json.dump(processed_articles, f, ensure_ascii=False, indent=2)
+    all_articles = []
 
-    return processed_articles
+    for i in range(1, pages + 1):
+        page_url = f"{url}{i}/"
+        page_content = fetch_habr_page(page_url)
+        print("Fetching articles from Habr...")
+        raw_articles = parse_articles(page_content)
+        processed_articles = processor.process_articles(raw_articles)
+        all_articles.extend(processed_articles)
+
+    with open("data/articles.json", "a", encoding="utf-8") as f:
+        json.dump(all_articles, f, ensure_ascii=False, indent=2, default=str)
+
+    async with get_session_context() as session:
+        await crud.save_articles_to_db(session, all_articles)
+
+    return all_articles
