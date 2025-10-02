@@ -66,6 +66,10 @@ class Article(Base):
         CheckConstraint('comments >= 0', name='comments_non_negative'),
     )
 
+    @property
+    def hubs(self) -> list["Hub"]:
+        return [link.hub for link in self.articles_hubs]
+
 
 class Hub(Base):
     """Represents a hub (category/tag) associated with an Article."""
@@ -76,6 +80,9 @@ class Hub(Base):
 
     articles_hubs: Mapped[list["ArticleHub"]] = relationship(
         back_populates="hub",
-        cascade="all, delete-orphan",
         lazy="selectin"
     )
+
+    @property
+    def articles(self) -> list["Article"]:
+        return [link.article for link in self.articles_hubs]

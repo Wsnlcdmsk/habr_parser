@@ -32,6 +32,7 @@ class ArticleBase(BaseModel):
     published: datetime | None = None
     views: int = 0
     comments: int = 0
+    is_top: bool = False
 
 
 class ArticleCreate(ArticleBase):

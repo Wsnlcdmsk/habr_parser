@@ -59,34 +59,56 @@ async def save_article(session: AsyncSession, article_data: dict) -> dict:
 
 async def read_article(session: AsyncSession, article_id: int) -> Article | None:
     """Read article from the database."""
-    stmt = select(Article).where(Article.id == article_id)
-    result = await session.execute(stmt)
-    return result.scalar_one_or_none()
-
-async def update_article(session: AsyncSession, article_id: int, new_data: dict) -> Article | None:
-    """Update article in the database."""
-    stmt = (
-        update(Article)
-        .where(Article.id == article_id)
-        .values(**new_data)
-        .returning(Article)
+    result = await session.get(
+        Article, article_id,
+        options=[selectinload(Article.articles_hubs).selectinload(ArticleHub.hub)]
     )
-    result = await session.execute(stmt)
+    return result
+
+async def update_article(
+    session: AsyncSession,
+    article_id: int,
+    new_data: dict
+) -> Article | None:
+    """Update article fields and hubs in the database."""
+    
+    article = await session.get(Article, article_id)
+    if not article:
+        return None
+
+    normal_fields = {k: v for k, v in new_data.items() if k != "hubs"}
+    for key, value in normal_fields.items():
+        if key == "url" and hasattr(value, "__str__"):
+            value = str(value)
+
+        setattr(article, key, value)
+
+    if "hubs" in new_data:
+        hubs_names = new_data["hubs"]
+
+        article.articles_hubs.clear()
+
+        for hub_name in hubs_names:
+            hub = await get_or_create_hub(session, hub_name)
+            article.articles_hubs.append(ArticleHub(hub=hub))
+
     await session.commit()
-    return result.scalar_one_or_none()
+    await session.refresh(article)
+    return article
 
 async def delete_article(session: AsyncSession, article_id: int) -> None:
     """Remove article from the database by id."""
-    stmt = delete(Article).where(Article.id == article_id)
-    await session.execute(stmt)
-    await session.commit()
+    article = await read_article(session, article_id)
+    if article:
+        await session.delete(article)
+        await session.commit()
 
 
 async def read_all_articles(session: AsyncSession) -> list[Article] | None:
     """Read all article from the database."""
     stmt = select(Article)
     result = await session.execute(stmt)
-    return result
+    return result.scalars().unique()
 
 async def save_articles_to_db(session: AsyncSession, articles: list[dict]) -> list[Article]:
     """Save articles to database."""
