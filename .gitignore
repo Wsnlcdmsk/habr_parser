@@ -1,7 +1,7 @@
-.env
-/venv
-pycache
-*.pyc
-data/articles.json
-.github
-TODO
+parser_api/.env
+parser_api/venv
+parser_api/pycache
+parser_api/*.pyc
+parser_api/data
+parser_api/.github
+parser_api/TODO
