@@ -1,7 +1,7 @@
 parser_api/.env
 parser_api/venv
-parser_api/pycache
-parser_api/*.pyc
+__pycache__/
+*.pyc
 parser_api/data
 parser_api/.github
 parser_api/TODO
