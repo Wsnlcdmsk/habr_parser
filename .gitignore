@@ -3,5 +3,4 @@ parser_api/venv
 __pycache__/
 *.pyc
 parser_api/data
-parser_api/.github
 parser_api/TODO
