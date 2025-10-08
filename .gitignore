@@ -4,3 +4,5 @@ __pycache__/
 *.pyc
 parser_api/data
 parser_api/TODO
+authorization/.env
+authorization/venv
