@@ -6,7 +6,7 @@ from fastapi.security import OAuth2PasswordBearer
 from pwdlib import PasswordHash
 
 from src.core.config import settings
-from src.models.token import TokenData
+from src.schemas.auth import TokenData
 
 
 password_hash = PasswordHash.recommended()

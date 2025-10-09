@@ -1,13 +1,9 @@
-"""This module contains pydantic's models for user."""
-from pydantic import BaseModel, EmailStr
+"""This module contains documents's models for user."""
+from beanie  import Document
 
 
-class BaseUser(BaseModel):
+class User(Document):
     """This class represents user."""
     username: str
-    email: EmailStr | None = None
-
-
-class UserInDB(BaseUser):
-    """This user represents how user stored in database."""
+    email: str | None = None
     hashed_password: str

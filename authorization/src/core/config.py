@@ -10,6 +10,11 @@ class Settings():
     APP_NAME: str = "authorization-service"
     APP_PORT: int = int(os.getenv("APP_PORT"))
 
+    MONGO_URI: str = os.getenv("MONGO_URI")
+    MONGO_DB_NAME: str = "auth_service"
+
+    REDIS_URL: str = os.getenv("REDIS_URL")
+
     JWT_SECRET: str = os.getenv("SECRET_KEY")
     JWT_ALGORITHM: str = os.getenv("ALGORITHM")
     ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))

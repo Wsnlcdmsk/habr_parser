@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from pydantic import EmailStr
 
-from src.models.token import Token
+from src.schemas.auth import Token
 
 
 router = APIRouter(prefix = "/auth", tags = ["authefication"])
