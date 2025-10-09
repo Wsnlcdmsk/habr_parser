@@ -6,16 +6,15 @@ from src.models.user import User
 
 client: AsyncIOMotorClient | None = None
 
-async def init_db():
+async def init_mongodb():
     """This functions open mongodb connection."""
     global client
     client = AsyncIOMotorClient(settings.MONGO_URI)
     db = client[settings.MONGO_DB_NAME]
-    # подключаем Beanie с нашими моделями
     await init_beanie(database=db, document_models=[User])
     print("✅ Beanie initialized and connected to MongoDB")
 
-async def close_db():
+async def close_mongodb():
     """This function close mongodb connection."""
     if client:
         client.close()

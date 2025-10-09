@@ -2,11 +2,13 @@
 from pydantic import BaseModel
 
 
-class Token(BaseModel):
-    """This class reperesents token."""
-    access_token: str
-    token_type: str
-
 class TokenData(BaseModel):
     """This class saves token data."""
-    username: str | None = None
+    user_id: str | None = None
+
+
+class TokenResponse(BaseModel):
+    """This class represents tokens."""
+    access_token: str
+    refresh_token: str
+    token_type: str

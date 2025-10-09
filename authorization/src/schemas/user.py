@@ -7,6 +7,12 @@ class UserCreate(BaseModel):
     password: str
 
 class UserOut(BaseModel):
-    """This shema helps to show some information about current user."""
+    """This schema helps to show safe user information."""
     id: str
-    email: EmailStr
+    username: str
+    email: EmailStr | None = None
+
+class UserUpdate(BaseModel):
+    """Schema for updating user info."""
+    username: str | None = None
+    email: EmailStr | None = None

@@ -42,6 +42,6 @@ async def find_user_by_id(user_id: str) -> User | None:
     return await UserRepository.find_user_by_id(user_id)
 
 
-async def find_user_by_email(user_email: str):
+async def find_user_by_email(user_email: str) -> User | None:
     """This function find user by email."""
     return await UserRepository.find_user_by_email(user_email)

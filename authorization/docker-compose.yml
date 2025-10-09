@@ -1,0 +1,41 @@
+version: "3.8"
+
+services:
+  mongodb:
+    image: mongo:7.0
+    container_name: mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_DATABASE: authorization_service
+    volumes:
+      - mongo_data:/data/db
+
+  redis:
+    image: redis:7.2
+    container_name: redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  authorization_service:
+    build: .
+    container_name: authorization_service
+    depends_on:
+      - mongodb
+      - redis
+    env_file:
+      - .env
+    ports:
+      - "9000:9000"
+    volumes:
+      - .:/app
+    command: uvicorn src.main:app --host 0.0.0.0 --port 9000
+    restart: always
+
+volumes:
+  mongo_data:
+  redis_data:

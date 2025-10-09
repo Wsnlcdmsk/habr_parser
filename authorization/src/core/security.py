@@ -24,7 +24,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     return password_hash.verify(plain_password, hashed_password)
 
 
-def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str :
+def create_access_token(data: dict, expires_delta: timedelta | None = None) -> str:
     """This function create access token."""
     to_encode = data.copy()
     if expires_delta:
@@ -36,8 +36,8 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None) -> s
     return encoded_jwt
 
 
-def decode_token(token: str) -> str:
+def decode_token(token: str) -> TokenData:
     """This function decode access token."""
     payload = jwt.decode(token, settings.JWT_SECRET, algorithms=[settings.JWT_ALGORITHM])
-    username =  payload.get("sub")
-    return TokenData(username=username)
+    user_id =  payload.get("sub")
+    return TokenData(user_id=user_id)
