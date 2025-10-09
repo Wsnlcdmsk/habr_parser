@@ -7,9 +7,9 @@ async def find_all_users() -> list[User]:
     return await User.find_all().to_list()
 
 
-async def find_user_by_id(email: str) -> User | None:
+async def find_user_by_id(user_id: str) -> User | None:
     """Find user in the collections by id."""
-    return await User.find_one(User.email == email)
+    return await User.get(user_id)
 
 
 async def find_user_by_email(user_email: str) -> User | None:

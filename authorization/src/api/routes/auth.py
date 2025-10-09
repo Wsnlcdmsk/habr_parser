@@ -18,7 +18,7 @@ async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
 ) -> TokenResponse:
     """This function helps to login into the service."""
     user = await UserService.find_user_by_email(form_data.username)
-    if user is None or verify_password(form_data.password, user.hashed_password):
+    if user is None or not verify_password(form_data.password, user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect email or password",
@@ -32,7 +32,12 @@ async def register(user_data: UserCreate) -> UserOut:
     """This function helps to register in the service."""
     try:
         user = await UserService.register_user(user_data)
-        return user
+
+        user_dict = user.model_dump()
+        user_dict["id"] = str(user.id)
+        user_dict.pop("_id", None)
+
+        return UserOut(**user_dict)
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,

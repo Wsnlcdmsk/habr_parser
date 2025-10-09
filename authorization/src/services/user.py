@@ -7,11 +7,12 @@ from src.core.security import get_password_hash
 
 async def register_user(data: UserCreate) -> User:
     """This functions register user."""
-    existing_user = await UserRepository.find_user_by_email(UserCreate.email)
+    existing_user = await UserRepository.find_user_by_email(str(data.email))
     if existing_user:
         raise ValueError("User already exists")
 
     user = User(
+        username=data.username,
         email=data.email,
         hashed_password=get_password_hash(data.password)
     )

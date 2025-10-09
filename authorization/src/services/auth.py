@@ -6,24 +6,24 @@ from src.core.security import create_access_token, decode_token
 from src.repositories import token as TokenRepository
 
 
-async def create_tokens(username: str) -> dict:
+async def create_tokens(user_id: str) -> dict:
     """Create access and refresh token's and save it to the redis."""
     access_token = create_access_token(
-        data={"sub": username},
+        data={"sub": user_id},
         expires_delta=timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES),
     )
 
     refresh_token = create_access_token(
-        data={"sub": username},
+        data={"sub": user_id},
         expires_delta=timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS),
     )
 
 
     await TokenRepository.save_token(
-        access_token, username, timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+        access_token, user_id, timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     )
     await TokenRepository.save_token(
-        refresh_token, username, timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
+        refresh_token, user_id, timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS)
     )
 
     return {
@@ -45,8 +45,8 @@ async def refresh_access_and_refresh_token(token: str) -> dict:
         raise ValueError("Invalid or expired refresh token")
 
     token_data = decode_token(token)
-    username = token_data.username
+    user_id = token_data.user_id
 
     await TokenRepository.delete_token(token)
 
-    return await create_tokens(username)
+    return await create_tokens(user_id)
