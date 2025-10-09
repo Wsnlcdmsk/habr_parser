@@ -3,6 +3,8 @@ parser_api/venv
 __pycache__/
 *.pyc
 parser_api/data
-parser_api/TODO
+TODO
 authorization/.env
 authorization/venv
+telegram_bot/.env
+telegram_bot/venv
